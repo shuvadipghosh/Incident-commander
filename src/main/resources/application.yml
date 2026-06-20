@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: incident-commander
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: qwen2.5:7b
