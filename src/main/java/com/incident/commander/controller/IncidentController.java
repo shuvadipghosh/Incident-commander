@@ -26,6 +26,8 @@ public class IncidentController {
             aiResponse = aiService.ask(request);
         } catch (IOException e) {
            return ResponseEntity.status(500).body(Map.of("error", "Failed to process the request: " + e.getMessage()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         return ResponseEntity.ok(aiResponse);

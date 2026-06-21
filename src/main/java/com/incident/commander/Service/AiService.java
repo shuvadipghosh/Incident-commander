@@ -1,6 +1,7 @@
 package com.incident.commander.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.incident.commander.dto.FuelStationDTO;
 import com.incident.commander.dto.IncidentRequest;
 import com.incident.commander.dto.IncidentResponseDTO;
 import org.springframework.ai.chat.client.ChatClient;
@@ -17,6 +18,8 @@ public class AiService {
     ChatClient chatClient;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    OverpassService overpassService;
 
 
     public AiService(ChatClient chatClient) {
@@ -30,7 +33,7 @@ public class AiService {
 //                .content();
 //    }
 
-    public IncidentResponseDTO ask(IncidentRequest request) throws IOException {
+    public IncidentResponseDTO ask(IncidentRequest request) throws Exception {
         String systemPrompt = loadPrompt(
                         "incident-command.md");
 
@@ -51,10 +54,17 @@ public class AiService {
                         .call()
                         .content();
 
-        return objectMapper.readValue(
+
+        FuelStationDTO fuelStationDTO = overpassService.findNearestFuelStation(request.getLatitude() , request.getLongitude());
+
+
+        IncidentResponseDTO incidentResponseDTO = objectMapper.readValue(
                 response,
                 IncidentResponseDTO.class);
 
+        incidentResponseDTO.setNearestFuelPump(fuelStationDTO.getDistanceKm());
+
+        return incidentResponseDTO;
     }
 
 
