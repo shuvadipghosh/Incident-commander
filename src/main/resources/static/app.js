@@ -14,8 +14,8 @@ const decisionBody = document.querySelector("#decisionBody");
 
 const fixedIncident = {
   scenario: "OUT_OF_FUEL",
-  latitude: "38.906488782604065",
-  longitude: "-77.04216727988438"
+  latitude: "40.23839724009791",
+  longitude: "-74.0125940932132"
 };
 
 const serviceProfiles = {
