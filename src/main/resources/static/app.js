@@ -12,6 +12,14 @@ const decisionBadge = document.querySelector("#decisionBadge");
 const summaryText = document.querySelector("#summaryText");
 const decisionBody = document.querySelector("#decisionBody");
 
+const phoneForm = document.querySelector("#phoneForm");
+const phoneInput = document.querySelector("#phoneNumber");
+const phoneError = document.querySelector("#phoneError");
+const phoneEntryScreen = document.querySelector("#phoneEntryScreen");
+const incidentScreen = document.querySelector("#incidentScreen");
+
+let userPhoneNumber = null;
+
 const fixedIncident = {
   scenario: "OUT_OF_FUEL",
   latitude: "40.23839724009791",
@@ -44,6 +52,54 @@ const loadingSteps = [
 ];
 
 let loadingTimer = null;
+
+// Phone Onboarding Form Logic
+phoneInput.addEventListener("input", () => {
+  phoneInput.classList.remove("input-error");
+  phoneError.textContent = "";
+
+  // Auto-format phone input as XXX-XXX-XXXX
+  let value = phoneInput.value.replace(/\D/g, "");
+  if (value.length > 10) {
+    value = value.slice(0, 10);
+  }
+
+  let formatted = "";
+  if (value.length > 0) {
+    if (value.length <= 3) {
+      formatted = value;
+    } else if (value.length <= 6) {
+      formatted = `${value.slice(0, 3)}-${value.slice(3)}`;
+    } else {
+      formatted = `${value.slice(0, 3)}-${value.slice(3, 6)}-${value.slice(6)}`;
+    }
+  }
+  phoneInput.value = formatted;
+});
+
+phoneForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const rawValue = phoneInput.value.trim();
+  const digits = rawValue.replace(/\D/g, "");
+
+  if (digits.length !== 10) {
+    phoneInput.classList.add("input-error");
+    phoneError.textContent = "Please enter a valid 10-digit phone number.";
+    phoneInput.focus();
+    return;
+  }
+
+  phoneInput.classList.remove("input-error");
+  phoneError.textContent = "";
+  userPhoneNumber = Number(digits);
+
+  // Transition to incident screen panel
+  phoneEntryScreen.setAttribute("hidden", "");
+  incidentScreen.removeAttribute("hidden");
+  setAppState("idle");
+
+  description.focus();
+});
 
 sampleButton.addEventListener("click", () => {
   description.value = "NO fuel can you please arrange";
@@ -92,7 +148,8 @@ form.addEventListener("submit", async (event) => {
       },
       body: JSON.stringify({
         ...fixedIncident,
-        description: text
+        description: text,
+        phoneNumber: userPhoneNumber
       })
     });
 

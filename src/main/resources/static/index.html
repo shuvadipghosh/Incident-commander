@@ -33,59 +33,94 @@
       </div>
     </header>
 
-    <main class="app-shell" id="app" data-state="idle">
-      <header class="hero">
-        <h1 class="hero-title">Tell us what happened</h1>
-        <p class="hero-intro">
-          Describe your issue and we will find the fastest safe option for you.
-        </p>
-      </header>
+    <main class="app-shell" id="app" data-state="phone-entry">
+      <!-- Phone Entry Screen -->
+      <div id="phoneEntryScreen" class="screen-panel">
+        <header class="hero">
+          <h1 class="hero-title">Welcome to Allstate Help</h1>
+          <p class="hero-intro">
+            Please enter your phone number to start your roadside assistance request.
+          </p>
+        </header>
 
-      <section class="main-panel">
-        <form id="incidentForm" class="incident-form" novalidate>
-          <label for="description">What do you need help with?</label>
-          <textarea
-            id="description"
-            name="description"
-            rows="4"
-            maxlength="500"
-            placeholder="Example: I ran out of fuel and I am parked on the shoulder."
-            autocomplete="off"
-          ></textarea>
-          <div class="form-meta">
-            <span id="charHint" class="char-hint" aria-live="polite"></span>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="primary-button" id="submitButton">
-              <span class="button-label">Get help now</span>
-              <span class="button-spinner" aria-hidden="true"></span>
-            </button>
-            <button type="button" id="sampleButton" class="text-button">
-              Try sample issue
-            </button>
-          </div>
-        </form>
-
-        <section
-          id="resultPanel"
-          class="result-panel"
-          aria-live="polite"
-          aria-atomic="true"
-          hidden
-        >
-          <div class="response-card">
-            <div class="response-header">
-              <span class="decision-badge" id="decisionBadge">Ready</span>
-              <h2 id="decisionTitle">We are here to help</h2>
+        <section class="main-panel">
+          <form id="phoneForm" class="incident-form" novalidate>
+            <label for="phoneNumber">What is your phone number?</label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              placeholder="e.g. 555-123-4567"
+              autocomplete="tel"
+              required
+            />
+            <div class="form-meta">
+              <span id="phoneError" class="input-error-message" aria-live="polite"></span>
             </div>
-            <p class="summary-text" id="summaryText"></p>
-            <div class="decision-body empty-state" id="decisionBody">
-              <div class="help-icon" aria-hidden="true">...</div>
-              <p>Your recommendation will appear here.</p>
+            <div class="form-actions">
+              <button type="submit" class="primary-button" id="phoneSubmitButton">
+                <span class="button-label">Continue</span>
+              </button>
             </div>
-          </div>
+          </form>
         </section>
-      </section>
+      </div>
+
+      <!-- Incident Reporting Screen -->
+      <div id="incidentScreen" class="screen-panel" hidden>
+        <header class="hero">
+          <h1 class="hero-title">Tell us what happened</h1>
+          <p class="hero-intro">
+            Describe your issue and we will find the fastest safe option for you.
+          </p>
+        </header>
+
+        <section class="main-panel">
+          <form id="incidentForm" class="incident-form" novalidate>
+            <label for="description">What do you need help with?</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
+              maxlength="500"
+              placeholder="Example: I ran out of fuel and I am parked on the shoulder."
+              autocomplete="off"
+            ></textarea>
+            <div class="form-meta">
+              <span id="charHint" class="char-hint" aria-live="polite"></span>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="primary-button" id="submitButton">
+                <span class="button-label">Get help now</span>
+                <span class="button-spinner" aria-hidden="true"></span>
+              </button>
+              <button type="button" id="sampleButton" class="text-button">
+                Try sample issue
+              </button>
+            </div>
+          </form>
+
+          <section
+            id="resultPanel"
+            class="result-panel"
+            aria-live="polite"
+            aria-atomic="true"
+            hidden
+          >
+            <div class="response-card">
+              <div class="response-header">
+                <span class="decision-badge" id="decisionBadge">Ready</span>
+                <h2 id="decisionTitle">We are here to help</h2>
+              </div>
+              <p class="summary-text" id="summaryText"></p>
+              <div class="decision-body empty-state" id="decisionBody">
+                <div class="help-icon" aria-hidden="true">...</div>
+                <p>Your recommendation will appear here.</p>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
     </main>
 
     <script src="/app.js"></script>

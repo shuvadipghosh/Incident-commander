@@ -7,6 +7,15 @@ public class IncidentRequest {
     private String description;
     private double latitude;
     private double longitude;
+    private long phoneNumber;
+
+    public long getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(long phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public String getScenario() {
         return scenario;
