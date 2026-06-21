@@ -20,6 +20,29 @@ const incidentScreen = document.querySelector("#incidentScreen");
 
 let userPhoneNumber = null;
 
+const mockPolicies = {
+  1234567890: {
+    insured: true,
+    policyNumber: "POL-987654",
+    coverage: ["FUEL_DELIVERY", "TOW_TRUCK"],
+    name: "John Doe"
+  },
+  9876543210: {
+    insured: true,
+    policyNumber: "POL-123456",
+    coverage: ["FUEL_DELIVERY"],
+    name: "Jane Smith"
+  }
+};
+
+function formatPhoneNumberDisplay(num) {
+  const str = String(num);
+  if (str.length === 10) {
+    return `(${str.slice(0, 3)}) ${str.slice(3, 6)}-${str.slice(6)}`;
+  }
+  return str;
+}
+
 const fixedIncident = {
   scenario: "OUT_OF_FUEL",
   latitude: "40.23839724009791",
@@ -116,6 +139,7 @@ description.addEventListener("input", () => {
 decisionBody.addEventListener("click", (event) => {
   const fuelDeliveryButton = event.target.closest("#fuelDeliveryOption");
   const uberChoiceButton = event.target.closest("[data-uber-choice]");
+  const acceptOfferButton = event.target.closest("#acceptPolicyOfferButton");
 
   if (fuelDeliveryButton) {
     renderDispatch("FUEL_DELIVERY");
@@ -124,6 +148,11 @@ decisionBody.addEventListener("click", (event) => {
 
   if (uberChoiceButton) {
     renderUberMessage(uberChoiceButton.dataset.uberChoice === "yes");
+    return;
+  }
+
+  if (acceptOfferButton) {
+    handleAcceptOffer(acceptOfferButton);
   }
 });
 
@@ -311,9 +340,14 @@ function renderWalkRecommendation(payload) {
   `;
 }
 
-function renderDispatch(action, payload) {
+function renderDispatch(action, payload, showOfferCard) {
   const profile = serviceProfiles[action];
   const showUber = action === "TOW_TRUCK";
+
+  if (showOfferCard === undefined) {
+    const policy = mockPolicies[userPhoneNumber];
+    showOfferCard = !(policy && policy.coverage && policy.coverage.includes(action));
+  }
 
   decisionTitle.textContent = profile.title;
   decisionBadge.textContent = profile.badge;
@@ -335,6 +369,8 @@ function renderDispatch(action, payload) {
       </div>
 
       ${showUber ? renderUberPrompt() : ""}
+
+      ${showOfferCard ? renderPolicyOfferCard(action) : ""}
     </div>
   `;
 }
@@ -368,6 +404,50 @@ function renderUberMessage(wantsUber) {
     ? "Ride request noted. A support agent can help coordinate pickup."
     : "No ride requested. Tow assistance remains active.";
 }
+
+function renderPolicyOfferCard(action) {
+  const estimatedCost = action === "FUEL_DELIVERY" ? 75 : 150;
+  
+  return `
+    <div class="policy-offer-card">
+      <div class="policy-offer-header">
+        <div class="offer-badge">Special Offer</div>
+        <h3>Save on your Allstate Premium</h3>
+      </div>
+      <p class="offer-description">
+        Your number <strong>${formatPhoneNumberDisplay(userPhoneNumber)}</strong> does not have active 
+        <strong>${action === "FUEL_DELIVERY" ? "Fuel Delivery" : "Towing"}</strong> coverage.
+      </p>
+      <div class="benefit-box">
+        <div class="benefit-icon">🛡️</div>
+        <div class="benefit-text">
+          <strong>Get credited for today's service!</strong>
+          <span>Enroll in Allstate Roadside Protection today, and we will deduct the dispatch cost of <strong>$${estimatedCost}</strong> directly from your premium.</span>
+        </div>
+      </div>
+      <div class="policy-action-row">
+        <button type="button" class="primary-button pulse-button" id="acceptPolicyOfferButton">
+          Add Coverage & Save $${estimatedCost}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function handleAcceptOffer(button) {
+  const card = button.closest(".policy-offer-card");
+  if (!card) return;
+
+  card.classList.add("offer-accepted");
+  card.innerHTML = `
+    <div class="success-message reveal-content">
+      <div class="success-icon">✓</div>
+      <strong>Allstate Coverage Activated!</strong>
+      <p>Thank you for enrolling in Allstate Roadside Protection. We've applied your discount to the policy premium.</p>
+    </div>
+  `;
+}
+
 
 function renderFallback(payload) {
   decisionTitle.textContent = "Help is being reviewed";

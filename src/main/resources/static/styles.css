@@ -697,6 +697,171 @@ h2 {
   }
 }
 
+/* Policy Offer Card */
+.policy-offer-card {
+  border: 2px dashed var(--allstate-blue);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8fbfd 0%, #eef6fc 100%);
+  padding: 20px;
+  margin-top: 16px;
+  box-shadow: 0 4px 15px rgba(0, 51, 160, 0.04);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.policy-offer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 51, 160, 0.08);
+}
+
+.policy-offer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.policy-offer-header h3 {
+  margin: 0;
+  color: var(--allstate-dark);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.offer-badge {
+  background: var(--allstate-blue);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.offer-description {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.offer-description strong {
+  color: var(--ink);
+}
+
+.benefit-box {
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 20px;
+}
+
+.benefit-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.benefit-text {
+  display: grid;
+  gap: 4px;
+}
+
+.benefit-text strong {
+  color: var(--allstate-dark);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.benefit-text span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.policy-action-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Micro-animations */
+.pulse-button {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 51, 160, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 51, 160, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 51, 160, 0);
+  }
+}
+
+/* Offer Accepted State */
+.policy-offer-card.offer-accepted {
+  border: 2px solid var(--success);
+  background: linear-gradient(135deg, #f5faf6 0%, #eaf6ee 100%);
+  animation: scale-up 0.3s var(--ease-out);
+}
+
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.success-message strong {
+  color: var(--success);
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.success-message p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+@keyframes scale-up {
+  from {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
