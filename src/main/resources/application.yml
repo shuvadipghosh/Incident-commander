@@ -6,3 +6,19 @@ spring:
       base-url: http://localhost:11434
       chat:
         model: qwen2.5:7b
+      embedding:
+        model: nomic-embed-text
+    vectorstore:
+      qdrant:
+        host: localhost
+        port: 6334
+        collection-name: rsa-knowledge
+        initialize-schema: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.incident.commander: DEBUG
+    org.springframework.ai: INFO

@@ -1,13 +1,8 @@
 package com.incident.commander.dto;
 
+import lombok.Data;
+
+@Data
 public class WeatherResponseDTO {
     private CurrentWeatherDTO current;
-
-    public CurrentWeatherDTO getCurrent() {
-        return current;
-    }
-
-    public void setCurrent(CurrentWeatherDTO current) {
-        this.current = current;
-    }
 }

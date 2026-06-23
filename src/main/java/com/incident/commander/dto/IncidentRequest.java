@@ -1,51 +1,17 @@
-
 package com.incident.commander.dto;
 
-public class IncidentRequest {
+import com.incident.commander.domain.IncidentType;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
-    private String scenario;
+@Data
+public class IncidentRequest {
+    @NotBlank(message = "Description is required")
     private String description;
+    private String scenario; // kept for backward compat with AiService
+    private IncidentType incidentTypeHint; // optional UI hint for classifier
     private double latitude;
     private double longitude;
     private long phoneNumber;
-
-    public long getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(long phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getScenario() {
-        return scenario;
-    }
-
-    public void setScenario(String scenario) {
-        this.scenario = scenario;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
+    private String sessionId;
 }

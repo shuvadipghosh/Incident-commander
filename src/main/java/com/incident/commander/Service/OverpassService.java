@@ -85,4 +85,60 @@ public class OverpassService {
                 .orElseThrow(() ->
                         new RuntimeException("No fuel stations found"));
     }
+
+    public FuelStationDTO findNearestMechanic(double userLat, double userLon) throws Exception {
+        String query = String.format("""
+                [out:json];
+                (
+                  node["shop"="tyres"](around:10000,%s,%s);
+                  node["amenity"="vehicle_service"](around:10000,%s,%s);
+                  node["shop"="car_repair"](around:10000,%s,%s);
+                );
+                out;
+                """, userLat, userLon, userLat, userLon, userLat, userLon);
+        return queryAndFindNearest(query, userLat, userLon, "Unknown Mechanic");
+    }
+
+    public FuelStationDTO findNearestHospital(double userLat, double userLon) throws Exception {
+        String query = String.format("""
+                [out:json];
+                (
+                  node["amenity"="hospital"](around:15000,%s,%s);
+                  node["amenity"="clinic"](around:10000,%s,%s);
+                );
+                out;
+                """, userLat, userLon, userLat, userLon);
+        return queryAndFindNearest(query, userLat, userLon, "Unknown Hospital");
+    }
+
+    private FuelStationDTO queryAndFindNearest(String query, double userLat, double userLon, String defaultName) throws Exception {
+        String response = restClient.get()
+                .uri("https://overpass-api.de/api/interpreter?data={query}", query)
+                .retrieve()
+                .body(String.class);
+
+        log.info("Overpass API Response (first 200 chars): {}", response.substring(0, Math.min(200, response.length())));
+
+        OverPassResponseDTO overpassResponse = objectMapper.readValue(response, OverPassResponseDTO.class);
+
+        if (overpassResponse.getElements() == null || overpassResponse.getElements().isEmpty()) {
+            throw new RuntimeException("No locations found nearby");
+        }
+
+        return overpassResponse.getElements().stream()
+                .map(element -> {
+                    String name = element.getTags().getOrDefault("name", defaultName);
+                    String street = element.getTags().getOrDefault("addr:street", "Unknown");
+                    double distance = DistanceUtil.distance(userLat, userLon, element.getLat(), element.getLon());
+                    FuelStationDTO station = new FuelStationDTO();
+                    station.setName(name);
+                    station.setStreet(street);
+                    station.setLatitude(element.getLat());
+                    station.setLongitude(element.getLon());
+                    station.setDistanceKm(distance);
+                    return station;
+                })
+                .min(Comparator.comparing(FuelStationDTO::getDistanceKm))
+                .orElseThrow(() -> new RuntimeException("No locations found nearby"));
+    }
 }

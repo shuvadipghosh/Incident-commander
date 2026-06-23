@@ -1,0 +1,270 @@
+<!-- Animated background -->
+<div class="bg-orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header class="app-header">
+  <div class="header-container">
+    <div class="brand-lockup">
+      <img src="allstate-hands.svg" alt="" class="brand-emblem" width="36" height="36" aria-hidden="true" />
+      <img src="allstate-wordmark.svg" alt="Allstate" class="brand-wordmark" width="110" height="22" />
+    </div>
+    <span class="header-badge">AI Roadside Assistance</span>
+  </div>
+</header>
+
+<main class="app-shell" [attr.data-screen]="currentScreen">
+
+  <!-- ─── Screen 1: Phone Entry ─── -->
+  <section *ngIf="currentScreen === 'phoneEntry'" id="screen-phone-entry" class="screen" aria-label="Phone number entry">
+    <div class="screen-content">
+      <div class="hero-icon">📱</div>
+      <h1 class="hero-title">Welcome to Allstate RSA</h1>
+      <p class="hero-sub">Enter your phone number to get started.</p>
+
+      <form (submit)="onPhoneSubmit()" class="card-form" novalidate>
+        <div class="field-group">
+          <label for="phoneNumber" class="field-label">Your phone number</label>
+          <input type="tel" id="phoneNumber" name="phoneNumber"
+            [class.has-error]="phoneError"
+            [value]="formattedPhone"
+            (input)="onPhoneInput($event)"
+            class="field-input"
+            placeholder="555-123-4567" autocomplete="tel" required />
+          <span class="field-error" aria-live="polite">{{ phoneError }}</span>
+        </div>
+        <button type="submit" class="btn btn-primary" id="phoneSubmitBtn">
+          <span class="btn-label">Continue</span>
+          <span class="btn-icon">→</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ─── Screen 2: Incident Picker ─── -->
+  <section *ngIf="currentScreen === 'incidentPicker'" id="screen-incident-picker" class="screen" aria-label="Select incident type">
+    <div class="screen-content">
+      <div class="greeting-bar">{{ greetingPhoneText }}</div>
+      <h1 class="hero-title">What do you need help with?</h1>
+      <p class="hero-sub">Select the type that best describes your situation.</p>
+
+      <div class="incident-grid" role="group" aria-label="Incident types">
+        <button type="button" (click)="selectIncident('OUT_OF_FUEL')" [className]="getIncidentCardClass('OUT_OF_FUEL')">
+          <span class="incident-icon">⛽</span>
+          <span class="incident-label">Out of Fuel</span>
+        </button>
+        <button type="button" (click)="selectIncident('FLAT_TYRE')" [className]="getIncidentCardClass('FLAT_TYRE')">
+          <span class="incident-icon">🔧</span>
+          <span class="incident-label">Flat Tyre</span>
+        </button>
+        <button type="button" (click)="selectIncident('DEAD_BATTERY')" [className]="getIncidentCardClass('DEAD_BATTERY')">
+          <span class="incident-icon">🔋</span>
+          <span class="incident-label">Dead Battery</span>
+        </button>
+        <button type="button" (click)="selectIncident('VEHICLE_SMOKE')" [className]="getIncidentCardClass('VEHICLE_SMOKE')">
+          <span class="incident-icon">💨</span>
+          <span class="incident-label">Vehicle Smoke</span>
+        </button>
+        <button type="button" (click)="selectIncident('MEDICAL_EMERGENCY')" [className]="getIncidentCardClass('MEDICAL_EMERGENCY')">
+          <span class="incident-icon">🏥</span>
+          <span class="incident-label">Medical Emergency</span>
+        </button>
+        <button type="button" (click)="selectIncident('ACCIDENT')" [className]="getIncidentCardClass('ACCIDENT')">
+          <span class="incident-icon">🚗</span>
+          <span class="incident-label">Accident</span>
+        </button>
+        <button type="button" (click)="selectIncident('NEARBY_MECHANIC')" [className]="getIncidentCardClass('NEARBY_MECHANIC')">
+          <span class="incident-icon">🔩</span>
+          <span class="incident-label">Find Mechanic</span>
+        </button>
+        <button type="button" (click)="selectIncident('TOW_REQUEST')" [className]="getIncidentCardClass('TOW_REQUEST')">
+          <span class="incident-icon">🚛</span>
+          <span class="incident-label">Request Tow</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Screen 3: Description ─── -->
+  <section *ngIf="currentScreen === 'description'" id="screen-description" class="screen" aria-label="Describe your situation">
+    <div class="screen-content">
+      <div class="selected-type-badge" [innerHTML]="getSelectedBadgeHtml()"></div>
+      <h1 class="hero-title">Tell us what happened</h1>
+      <p class="hero-sub">The more detail you provide, the better we can help.</p>
+
+      <form (submit)="onSubmitDescription()" class="card-form" novalidate>
+        <div class="field-group">
+          <label for="description" class="field-label">Describe your situation</label>
+          <textarea id="description" name="description"
+            [(ngModel)]="description"
+            (input)="onDescriptionInput()"
+            class="field-textarea" rows="4"
+            maxlength="500" placeholder="Example: My car ran out of fuel and I'm parked on the highway shoulder."
+            autocomplete="off" required></textarea>
+          <span class="char-hint" aria-live="polite">{{ charCountText }}</span>
+        </div>
+
+        <div class="location-row">
+          <div class="location-status">
+            <span class="location-dot" [ngClass]="locationState.status"></span>
+            <span>{{ locationState.message }}</span>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="useMyLocation()" [disabled]="locationState.status === 'loading'">
+            📍 Use My Location
+          </button>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-full" [disabled]="!description.trim()">
+            <span class="btn-label">Get Help Now</span>
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="backToPicker()">← Change incident type</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ─── Screen 4: Progress / Live Streaming ─── -->
+  <section *ngIf="currentScreen === 'progress'" id="screen-progress" class="screen" aria-label="Processing your request">
+    <div class="screen-content">
+      <div class="progress-header">
+        <div class="ai-pulse" aria-hidden="true"></div>
+        <h1 class="hero-title">AI Commander is on it</h1>
+        <p class="hero-sub">{{ progressSubtext }}</p>
+      </div>
+      <div class="progress-timeline" aria-live="polite" aria-atomic="false">
+        <div *ngFor="let ev of timelineEvents" class="timeline-event">
+          <div class="timeline-icon" [ngClass]="ev.type">{{ ev.icon }}</div>
+          <div class="timeline-content">
+            <div class="timeline-title">{{ ev.title }}</div>
+            <div class="timeline-detail">{{ ev.detail }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Screen 5: Result ─── -->
+  <section *ngIf="currentScreen === 'result'" id="screen-result" class="screen" aria-label="Your assistance plan">
+    <div class="screen-content">
+      
+      <!-- Result Header -->
+      <div class="result-header">
+        <div class="result-badge" [ngClass]="isEmergencyResult() ? 'danger' : getResultMeta().tone">
+          {{ getResultMeta().icon }} {{ getResultMeta().label }}
+        </div>
+        <h1 class="result-title">{{ getResultTitle() }}</h1>
+        <p class="result-summary">{{ resultPayload?.summary || 'Help is being arranged for you.' }}</p>
+      </div>
+
+      <!-- Result Body -->
+      <div class="result-body">
+        
+        <!-- Active Dispatch Card -->
+        <div *ngIf="resultPayload?.dispatchDetails?.status === 'DISPATCHED'" class="dispatch-card">
+          <div class="dispatch-card-glow"></div>
+          <div class="dispatch-header">
+            <div class="dispatch-pulse-dot"></div>
+            <strong class="dispatch-status">Service Scheduled & Dispatched</strong>
+          </div>
+          <div class="dispatch-grid">
+            <div class="dispatch-item">
+              <span class="dispatch-label">Active Service</span>
+              <span class="dispatch-value">{{ getActionLabel(resultPayload?.dispatchDetails?.serviceType) }}</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-label">Provider</span>
+              <span class="dispatch-value">{{ resultPayload?.dispatchDetails?.provider || 'Allstate Network Partner' }}</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-label">Confirmation ID</span>
+              <span class="dispatch-value highlight">{{ resultPayload?.dispatchDetails?.confirmationId }}</span>
+            </div>
+            <div class="dispatch-item">
+              <span class="dispatch-label">Estimated Arrival</span>
+              <span class="dispatch-value eta-highlight">⏱ {{ resultPayload?.dispatchDetails?.eta || '30-45 mins' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Banner -->
+        <div *ngIf="isEmergencyResult()" class="emergency-banner">
+          <div class="emergency-banner-icon">🚨</div>
+          <div class="emergency-banner-text">
+            <strong>Emergency Response Active</strong>
+            <span>Emergency services have been notified. Stay safe and follow the recommendations below.</span>
+          </div>
+        </div>
+
+        <!-- Info Tiles (Weather, nearest station) -->
+        <div *ngIf="resultPayload?.weather || resultPayload?.nearestFuelPump > 0" class="info-tiles">
+          <div *ngIf="resultPayload?.weather?.condition" class="info-tile">
+            <div class="info-tile-label">Weather</div>
+            <div class="info-tile-value">{{ resultPayload?.weather?.condition }}</div>
+            <div class="info-tile-unit">{{ resultPayload?.weather?.temperature | number:'1.0-0' }}°C</div>
+          </div>
+          <div *ngIf="resultPayload?.nearestFuelPump > 0" class="info-tile">
+            <div class="info-tile-label">Nearest Station</div>
+            <div class="info-tile-value">{{ formatDistanceKm(resultPayload?.nearestFuelPump) }}</div>
+            <div class="info-tile-unit">{{ formatDistanceLabel(resultPayload?.nearestFuelPump) }}</div>
+          </div>
+        </div>
+
+        <!-- Coverage Card -->
+        <div *ngIf="resultPayload?.contextData?.coverage?.length" class="coverage-card">
+          <div class="coverage-card-header">
+            <span>🛡️</span>
+            <span class="coverage-card-title">Policy: {{ resultPayload?.contextData?.policyNumber || 'Active' }}</span>
+            <span *ngIf="resultPayload?.contextData?.policyHolder" style="font-size:12px;color:var(--text-secondary)">
+              · {{ resultPayload?.contextData?.policyHolder }}
+            </span>
+          </div>
+          <div class="coverage-tags">
+            <span *ngFor="let cov of resultPayload?.contextData?.coverage" class="coverage-tag">
+              {{ cov.replace('_', ' ') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Recommendations Grid -->
+        <div *ngIf="resultPayload?.recommendations?.length" class="rec-list">
+          <div *ngFor="let rec of resultPayload.recommendations" class="rec-card">
+            <div class="rec-rank" [class.emergency]="rec.action === 'CALL_911' || rec.action === 'EXIT_VEHICLE_IMMEDIATELY'">
+              {{ rec.rank }}
+            </div>
+            <div class="rec-content">
+              <div class="rec-action">{{ getActionLabel(rec.action) }}</div>
+              <div class="rec-reason">{{ rec.reason }}</div>
+              <div *ngIf="rec.eta" class="rec-eta">⏱ ETA: {{ rec.eta }}</div>
+              <div *ngIf="hasActionConfig(rec.action)">
+                <button type="button" class="btn btn-sm rec-btn"
+                  [ngClass]="(rec.action === 'CALL_911' || rec.action === 'EXIT_VEHICLE_IMMEDIATELY') ? 'btn-danger' : 'btn-primary'"
+                  (click)="triggerAction(rec.action)">
+                  {{ getActionConfig(rec.action).btnText }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Start Over Actions -->
+      <div class="result-actions">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="startOver()">← Start new request</button>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- Action Confirmation Modal -->
+<app-action-modal *ngIf="modalState.show"
+  [icon]="modalState.icon"
+  [title]="modalState.title"
+  [message]="modalState.message"
+  (close)="closeModal()">
+</app-action-modal>

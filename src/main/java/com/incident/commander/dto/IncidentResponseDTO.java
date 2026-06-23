@@ -1,46 +1,33 @@
 package com.incident.commander.dto;
 
+import lombok.Data;
 import java.util.List;
+import java.util.Map;
 
+@Data
 public class IncidentResponseDTO {
-
+    private String incidentType;
     private String summary;
-
-    private WeatherSummaryDTO weather;
-
-    private double nearestFuelPump;
-
+    private WeatherDTO weather;
+    private double nearestFuelPump; // kept for OUT_OF_FUEL backward compat
     private List<RecommendationDTO> recommendations;
+    private Map<String, Object> contextData;
+    private DispatchDetailsDTO dispatchDetails;
+    private String sessionId;
 
-    public String getSummary() {
-        return summary;
+    @Data
+    public static class WeatherDTO {
+        private String condition;
+        private double temperature;
+        private double rain;
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public void setNearestFuelPump(double nearestFuelPump) {
-        this.nearestFuelPump = nearestFuelPump;
-    }
-
-    public double getNearestFuelPump(){
-        return this.nearestFuelPump;
-    }
-
-    public WeatherSummaryDTO getWeather() {
-        return weather;
-    }
-
-    public void setWeather(WeatherSummaryDTO weather) {
-        this.weather = weather;
-    }
-
-    public List<RecommendationDTO> getRecommendations() {
-        return recommendations;
-    }
-
-    public void setRecommendations(List<RecommendationDTO> recommendations) {
-        this.recommendations = recommendations;
+    @Data
+    public static class DispatchDetailsDTO {
+        private String status;
+        private String serviceType;
+        private String provider;
+        private String confirmationId;
+        private String eta;
     }
 }

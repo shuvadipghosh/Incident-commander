@@ -1,35 +1,12 @@
 package com.incident.commander.dto;
 
+import lombok.Data;
 
 import java.util.Map;
 
+@Data
 public class Element {
     private double lat;
     private double lon;
     private Map<String, String> tags;
-
-
-    public double getLat() {
-        return lat;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public double getLon() {
-        return lon;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
-    }
-
-    public Map<String, String> getTags() {
-        return tags;
-    }
-
-    public void setTags(Map<String, String> tags) {
-        this.tags = tags;
-    }
 }
