@@ -29,5 +29,6 @@ public class IncidentResponseDTO {
         private String provider;
         private String confirmationId;
         private String eta;
+        private String cost;
     }
 }

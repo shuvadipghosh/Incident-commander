@@ -7,8 +7,10 @@ import com.incident.commander.domain.IncidentType;
 import com.incident.commander.dto.IncidentRequest;
 import com.incident.commander.dto.IncidentResponseDTO;
 import com.incident.commander.dto.RecommendationDTO;
+import com.incident.commander.dto.PolicyDTO;
 import com.incident.commander.pipeline.IncidentPipeline;
 import com.incident.commander.service.PolicyService;
+import java.util.Optional;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,7 @@ public class IncidentController {
 
         // Step 3: Process (tools will be called inside the agent)
         try {
+            Optional<PolicyDTO> policyOpt = policyService.findByPhoneNumber(request.getPhoneNumber());
             IncidentContext context = IncidentContext.builder()
                     .incidentType(type)
                     .description(request.getDescription())
@@ -72,6 +75,10 @@ public class IncidentController {
                     .longitude(request.getLongitude())
                     .phoneNumber(request.getPhoneNumber())
                     .sessionId(sessionId)
+                    .policyNumber(policyOpt.map(PolicyDTO::getPolicyNumber).orElse(null))
+                    .policyHolder(policyOpt.map(PolicyDTO::getName).orElse(null))
+                    .coverage(policyOpt.map(PolicyDTO::getCoverage).orElse(null))
+                    .insured(policyOpt.map(PolicyDTO::isInsured).orElse(false))
                     .build();
 
             IncidentResult result = incidentPipeline.process(context);
@@ -97,6 +104,7 @@ public class IncidentController {
         IncidentType type = classifierAgent.classify(request.getDescription(), request.getIncidentTypeHint());
         log.info("Incident classified as {} for session {}", type, sessionId);
 
+        Optional<PolicyDTO> policyOpt = policyService.findByPhoneNumber(request.getPhoneNumber());
         IncidentContext context = IncidentContext.builder()
                 .incidentType(type)
                 .description(request.getDescription())
@@ -104,6 +112,10 @@ public class IncidentController {
                 .longitude(request.getLongitude())
                 .phoneNumber(request.getPhoneNumber())
                 .sessionId(sessionId)
+                .policyNumber(policyOpt.map(PolicyDTO::getPolicyNumber).orElse(null))
+                .policyHolder(policyOpt.map(PolicyDTO::getName).orElse(null))
+                .coverage(policyOpt.map(PolicyDTO::getCoverage).orElse(null))
+                .insured(policyOpt.map(PolicyDTO::isInsured).orElse(false))
                 .build();
 
         return incidentPipeline.process(context);
@@ -141,6 +153,7 @@ public class IncidentController {
                         r.setAction(a.getAction());
                         r.setReason(a.getReason());
                         r.setEta(a.getEta());
+                        r.setCost(a.getCost());
                         return r;
                     })
                     .toList());
@@ -153,6 +166,7 @@ public class IncidentController {
             ddDTO.setProvider(result.getDispatchDetails().getProvider());
             ddDTO.setConfirmationId(result.getDispatchDetails().getConfirmationId());
             ddDTO.setEta(result.getDispatchDetails().getEta());
+            ddDTO.setCost(result.getDispatchDetails().getCost());
             dto.setDispatchDetails(ddDTO);
         }
 

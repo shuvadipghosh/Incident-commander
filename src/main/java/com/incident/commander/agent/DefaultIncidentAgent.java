@@ -66,6 +66,34 @@ public class DefaultIncidentAgent implements IncidentAgent {
             systemPrompt = systemPrompt + "\n\n## Relevant Policy Rules\n" + String.join("\n", relevantRules);
         }
 
+        // Construct detailed prompt snippet outlining user's coverage
+        StringBuilder coveragePrompt = new StringBuilder();
+        coveragePrompt.append("\n\n## User Insurance Coverage\n");
+        if (context.isInsured()) {
+            coveragePrompt.append("Policy Number: ").append(context.getPolicyNumber()).append("\n");
+            coveragePrompt.append("Policy Holder: ").append(context.getPolicyHolder()).append("\n");
+            coveragePrompt.append("Covered Services/Actions: ");
+            if (context.getCoverage() != null && !context.getCoverage().isEmpty()) {
+                coveragePrompt.append(String.join(", ", context.getCoverage()));
+            } else {
+                coveragePrompt.append("None");
+            }
+            coveragePrompt.append("\n");
+        } else {
+            coveragePrompt.append("The user is uninsured (no active policy or policy not found).\n");
+        }
+
+        // Append cost calculation instructions to systemPrompt
+        coveragePrompt.append("\n## Cost Calculation Instructions\n")
+                .append("You must dynamically calculate the cost for each recommended action and dispatch details in the returned JSON.\n")
+                .append("1. Look at the 'User Insurance Coverage' above to determine what services/coverage the user has.\n")
+                .append("2. Look at the 'Relevant Policy Rules' (which contains rates from service-providers.md) to find the standard price for the service/action (e.g., $75 for fuel delivery, $150 for towing/tow truck, $80 for tyre repair/flat tyre, $80 for battery jump start/dead battery, etc.).\n")
+                .append("3. If the service or action is covered by the user's insurance coverage, set the 'cost' field to exactly \"Covered\".\n")
+                .append("4. If the user is uninsured or the service/action is not covered, set the 'cost' field to the price specified in the rules (e.g., \"$75\", \"$150\", \"$80\", etc.). If no price is specified, you can set it to null or calculate/omit as appropriate.\n")
+                .append("Apply this cost calculation logic to both the 'cost' field of each object in the 'recommendations' array and the 'cost' field of the 'dispatchDetails' object. For recommended actions, match the action name (e.g., 'FUEL_DELIVERY', 'TOW_TRUCK', 'TYRE_REPAIR_SERVICE', 'JUMP_START_SERVICE', etc.) to the coverage/rules. For dispatch details, match the service type. Make sure to include the 'cost' field in the returned JSON matching this calculation.\n");
+
+        systemPrompt = systemPrompt + coveragePrompt.toString();
+
         // Select tools for this incident type
         Object[] tools = selectTools(type);
 

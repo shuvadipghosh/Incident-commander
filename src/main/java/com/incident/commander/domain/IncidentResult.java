@@ -31,6 +31,7 @@ public class IncidentResult {
         private String action;
         private String reason;
         private String eta;
+        private String cost;
     }
 
     @Data
@@ -41,5 +42,6 @@ public class IncidentResult {
         private String provider;
         private String confirmationId;
         private String eta;
+        private String cost;
     }
 }

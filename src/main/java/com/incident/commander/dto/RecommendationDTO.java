@@ -8,4 +8,5 @@ public class RecommendationDTO {
     private String action;
     private String reason;
     private String eta;
+    private String cost;
 }

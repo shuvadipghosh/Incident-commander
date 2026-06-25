@@ -186,6 +186,12 @@
               <span class="dispatch-label">Estimated Arrival</span>
               <span class="dispatch-value eta-highlight">⏱ {{ resultPayload?.dispatchDetails?.eta || '30-45 mins' }}</span>
             </div>
+            <div class="dispatch-item" *ngIf="resultPayload?.dispatchDetails?.cost">
+              <span class="dispatch-label">Cost</span>
+              <span class="dispatch-value cost-highlight" [class.covered]="resultPayload.dispatchDetails.cost === 'Covered'">
+                {{ resultPayload.dispatchDetails.cost }}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -235,7 +241,12 @@
               {{ rec.rank }}
             </div>
             <div class="rec-content">
-              <div class="rec-action">{{ getActionLabel(rec.action) }}</div>
+              <div class="rec-action">
+                {{ getActionLabel(rec.action) }}
+                <span *ngIf="rec.cost" class="rec-cost-badge" [ngClass]="rec.cost === 'Covered' ? 'covered' : 'charged'">
+                  {{ rec.cost }}
+                </span>
+              </div>
               <div class="rec-reason">{{ rec.reason }}</div>
               <div *ngIf="rec.eta" class="rec-eta">⏱ ETA: {{ rec.eta }}</div>
               <div *ngIf="hasActionConfig(rec.action)">
