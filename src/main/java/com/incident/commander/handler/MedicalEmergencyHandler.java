@@ -20,21 +20,4 @@ public class MedicalEmergencyHandler extends BaseIncidentHandler {
         return IncidentType.MEDICAL_EMERGENCY;
     }
 
-    @Override
-    public IncidentResult handle(IncidentContext context) {
-        log.warn("MEDICAL EMERGENCY for session {}", context.getSessionId());
-        IncidentResult result = super.handle(context);
-        // Always prepend 911 call action for medical emergencies
-        List<IncidentResult.RecommendedAction> actions = new ArrayList<>();
-        actions.add(IncidentResult.RecommendedAction.builder()
-                .rank(0)
-                .action("CALL_911")
-                .reason("Medical emergency — call emergency services immediately if life is at risk.")
-                .build());
-        if (result.getRecommendations() != null) {
-            actions.addAll(result.getRecommendations());
-        }
-        result.setRecommendations(actions);
-        return result;
-    }
 }
